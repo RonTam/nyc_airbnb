@@ -1,12 +1,12 @@
-# Introduction
+# Build an ML Pipeline for Short-Term Rental Prices in NYC
 You are working for a property management company renting rooms and properties for short periods of 
-time on AirBnB and similar platforms. You need to estimate the typical price for a given property based 
+time on various rental platforms. You need to estimate the typical price for a given property based 
 on the price of similar properties. Your company receives new data in bulk every week. The model needs 
 to be retrained with the same cadence, necessitating an end-to-end pipeline that can be reused.
 
 In this project you will build such a pipeline.
 
-# Table of contents
+## Table of contents
 
 - [Introduction](#introduction)
 - [Starter kit](#starter-kit)
@@ -32,13 +32,13 @@ In this project you will build such a pipeline.
   * [Release the pipeline](#release-the-pipeline)
   * [Train the model on a new data sample](#train-the-model-on-a-new-data-sample)
 
-# Starter kit
+## Starter kit
 You will start working on your project by downloading the starter kit. Create a new GitHub
 repository, and commit and push the starter kit to it.
 
-## Preliminary steps
+### Preliminary steps
 
-### Create environment
+#### Create environment
 Make sure to have conda installed and ready, then create a new environment using the ``environment.yml``
 file provided in the root of the starter kit and activate it:
 
@@ -47,7 +47,7 @@ file provided in the root of the starter kit and activate it:
 > conda activate nyc_airbnb_dev
 ```
 
-### Get API key for Weights and Biases
+#### Get API key for Weights and Biases
 Get your API key from W&B by going to [https://wandb.ai/authorize](https://wandb.ai/authorize) 
 and set this environment variable:
 
@@ -61,12 +61,12 @@ Then login to W&B:
 > wandb login $WANDB_API_KEY
 ```
 
-## GitHub
+### GitHub
 Create a repository named ``nyc_airbnb`` in your github account and commit your code there. 
 Commit and push to the repository often while you make progress towards the solution. Remember 
 to add meaningful commit messages.
 
-## Cookie cutter
+### Cookie cutter
 You are also provided a cookie cutter template that you can use to create stubs for new pipeline steps. Just run
 the cookiecutter and enter the required information. Remember to leave the default when asked for ``arguments``.
 For example:
@@ -100,12 +100,12 @@ The script ``run.py`` will receive the input parameters ``parameter1``, ``parame
 > mlflow run src/step_name -P parameter1=1 -P parameter2=2 -P parameter3="test"
 ```
 
-## The ``main.py`` file
+### The ``main.py`` file
 The pipeline is defined in the ``main.py`` file in the root of the starter kit. The file already
 contains some boilerplate code as well as the download step. Your task will be to develop the
 needed additional step, and then add them to the ``main.py`` file.
 
-## The configuration
+### The configuration
 All the parameters controlling the pipeline are defined in the ``config.yaml`` file defined in
 the root of the starter kit. Open this file and get familiar with its content. 
 This file is only read by the ``main.py`` script (i.e., the pipeline) and its content is
@@ -120,7 +120,7 @@ accessed from the configuration file.
 We will use Hydra to manage this configuration file. This means that every parameter can be
 easily overridden from the command line (see the section Running the pipeline).
 
-## Running the pipeline
+### Running the pipeline
 In order to run the pipeline you need to be in the root of the starter kit, then you can execute:
 
 ```bash
@@ -150,14 +150,14 @@ modeling -> random_forest -> n_estimators to 10 and etl->min_price to 50:
   -P override="modeling.random_forest.n_estimators=10 etl.min_price=50"
 ```
 
-## Pre-existing steps
+### Pre-existing steps
 In order to simulate a real-world situation, we are providing you with some pre-implemented
 re-usable steps (``components``). In order to use them, refer to their ``MLproject`` file: there
 you can find the parameters that they accept with a description.
 
-# Steps
+## Steps
 
-## Exploratory Data Analysis (EDA)
+### Exploratory Data Analysis (EDA)
 The scope of this section is to get an idea of how the process of an EDA works in the context of
 pipelines, during the data exploration phase. In a real scenario you would spend a lot more time
 in this phase, but here we are going to do the bare minimum.
@@ -346,7 +346,7 @@ with the cleaned data:
    ```
 5. Run the pipeline
 
-## Data testing
+### Data testing
 After the cleaning, it is a good practice to put some tests that verify that the data does not
 contain surprises. 
 
@@ -358,7 +358,7 @@ artifact tab. Click on "clean_sample", then on the version with the ``latest`` t
 last one we produced in the previous step. Add a tag ``reference`` to it by clicking the "+"
 in the Aliases section on the right:
 
-![screenshot](screenshot1.png "screenshot")
+![reference tag](images/wandb-tag-data-test.png "adding a reference tag")
  
 Now we are ready to add some tests. In the starter kit you can find a ``data_tests`` step
 that you need to complete. Let's start by appending to 
@@ -381,7 +381,7 @@ use ``config["data_check"]["kl_threshold"]`` for the ``kl_threshold`` parameter.
 
 Then run the pipeline and make sure the tests are executed and that they pass.
 
-## Data splitting
+### Data splitting
 Use the provided component called ``train_val_test_split`` to split the dataset in training, 
 validation and test set. Add it to the pipeline then run the pipeline. 
 
@@ -401,7 +401,7 @@ After you execute, you will see something like:
 in the log. This tells you that the script is uploading 3 new datasets: ``train_data.csv``,
 ``val_data.csv`` and ``test_data.csv``.
 
-## Train Random Forest
+### Train Random Forest
 Complete the script ``src/train_random_forest/run.py``. You will need to:
 1. Download the train and validation data using W&B
 2. Read them with pandas. This is already implemented in the file.
@@ -417,7 +417,7 @@ Then add it to ``main.py``. Use the name ``random_forest_export`` as ``output_ar
 **_NOTE_**: the main.py file already provides a variable ``rf_config`` to be passed as the
             ``rf_config`` parameter.
 
-## Optimize hyperparameters
+### Optimize hyperparameters
 Re-run the entire pipeline varying the hyperparameters of the Random Forest model. This can be
 accomplished easily by exploiting the Hydra configuration system:
 
@@ -432,10 +432,10 @@ Look at the Hydra documentation for even more ways to do hyperparameters optimiz
 is very powerful, and allows even to use things like Bayesian optimization without any change
 to the pipeline itself.
 
-## Select the best model
+### Select the best model
 Go to W&B and select the best performing model. 
 
-![wandb](wandb_select_best.gif "wandb")
+![wandb](images/wandb_select_best.gif "wandb")
 
 **_HINT_**: you should switch to the Table view (second icon on the left), then click on the upper
             right on "columns", remove all selected columns by clicking on "Hide all", then click
@@ -448,7 +448,7 @@ When you have found the best job, click on its name, then go to its artifacts an
 "model_export" output artifact.  You can now add a ``prod`` tag to it to mark it as 
 "production ready".
 
-## Test
+### Test
 Use the provided step ``test_regression_model`` to test your production model against the
 test set.
 
@@ -460,13 +460,13 @@ activate it explicitly on the command line:
 > mlflow run . -P wandb_api_key=$WANDB_API_KEY -P steps=test_regression_model
 ```
 
-## Visualize the pipeline
+### Visualize the pipeline
 You can now go to W&B, go the Artifacts section, select the model export artifact then click on the
 ``Graph view`` tab. You will see something like this:
 
-![screenshot](screenshot3.png "screenshot")
+![pipeline graph](images/wandb-pipeline-graph.png "pipeline graph")
 
-## Release the pipeline
+### Release the pipeline
 First copy the best hyper parameters you found in your ``configuration.yml`` so they become the
 default values. Then, go to your repository on GitHub and make a release. 
 If you need a refresher, here are some [instructions](https://docs.github.com/en/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release)
@@ -474,12 +474,12 @@ on how to release on GitHub.
 
 Call the release ``1.0.0``:
 
-![screenshot](screenshot2.png "screenshot")
+![tag the release](images/tag-release-github.png "tag the release")
 
 If you find problems in the release, fix them and then make a new release like ``1.0.1``, ``1.0.2``
 and so on.
 
-## Train the model on a new data sample
+### Train the model on a new data sample
 
 Let's now test that we can run the release using ``mlflow`` without any other pre-requisite. We will
 train the model on a new sample of data that our company received (``sample2.csv``):
@@ -510,3 +510,7 @@ This will drop rows in the dataset that are not in the proper geolocation.
 Then commit your change, make a new release (``1.0.1``) and retry (of course you need to use 
 ``-v 1.0.1`` when calling mlflow this time). Now the run should succeed and voit la', 
 you have trained your new model on the new data.
+
+## License
+
+[License](LICENSE.txt)
